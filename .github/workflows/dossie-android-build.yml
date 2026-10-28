@@ -1,8 +1,7 @@
 name: Dossie Android 1.1 build
 on:
   push:
-    branches:
-      - dossie-android-v11-build
+    branches: [dossie-android-v11-build]
   workflow_dispatch:
 jobs:
   android:
@@ -22,10 +21,11 @@ jobs:
           java-version: '17'
       - name: Preparar Android SDK existente
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          command -v sdkmanager
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          SDKM=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)
+          test -n "$SDKM"
+          echo "Usando Android SDK: $SDKM"
+          yes | "$SDKM" --licenses >/dev/null || true
+          "$SDKM" 'platforms;android-35' 'build-tools;35.0.0'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
